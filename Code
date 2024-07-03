@@ -1,0 +1,308 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <limits>
+using namespace std;
+
+void clearScreen() {
+    cout << "\033[2J\033[1;1H"; 
+}
+
+//Untuk menampilkan informasi buku
+class Buku {
+public:
+    string judul;
+    string tema;
+    string penulis;
+    string penerbit;
+    int harga;
+
+    Buku(string j, string p, string t, string d, int h) : judul(j), penulis(p), tema(t), penerbit(d), harga(h) {}
+
+    void tampilkanInformasi() const {
+        clearScreen();
+        cout << "========================================" << endl;
+        cout << "             Informasi Buku             " << endl;
+        cout << "========================================" << endl;
+        cout << "Judul    : " << judul << endl;
+        cout << "Penulis  : " << penulis << endl;
+        cout << "Tema     : " << tema << endl;
+        cout << "Penerbit : " << penerbit << endl;
+        cout << "Harga    : " << harga << endl;
+        cout << "========================================" << endl;
+    }
+};
+
+//Untuk menampilkan Kategori buku
+class Tema {
+public:
+    string kategori;
+    Tema(string k) : kategori(k) {}
+
+    void tampilkanInformasi() const {
+        clearScreen();
+        cout << "========================================" << endl;
+        cout << "             Kategori Buku              " << endl;
+        cout << "========================================" << endl;
+        cout << kategori << endl;
+        cout << "========================================" << endl;
+    }
+};
+
+void Menu();
+void DaftarBuku(vector<Buku> &daftarBuku);
+void pengkategorian(const vector<Tema> &kategoriBuku);
+void searchBuku(const vector<Buku> &daftarBuku);
+void beliBuku(vector<Buku> &daftarBuku, int index);
+void tampilkanNotaPembayaran(const Buku &buku);
+
+//Inisialisasi vektor data buku
+vector<Buku> daftarBuku = {
+    Buku("Gadis Kretek", "Ratih Kumala", "Fiksi", "Gramedia Pustaka Utama", 56000),
+    Buku("Matahari Minor", "Tere Liye", "Fiksi", "Sabak Grip", 99000),
+    Buku("Dia Adalah Kakakku", "Tere Liye", "Fiksi", "Sabak Grip", 76000),
+    Buku("Saga dari Samudra", "Ratih Kumala", "Fiksi", "Gramedia Pustaka Utama", 74000),
+    Buku("Hafalan Shalat Delisa", "Tere Liye", "Fiksi", "Penerbit Republika", 57000),
+    Buku("Filosofi Teras", "Henry Manampiring", "Filsafat", "Buku Kompas", 97000),
+    Buku("Filosofi Air, Kita Air bukan Api", "Deddy Irawan", "Filsafat", "Elex Media Komputindo", 83000),
+    Buku("Dasar-Dasar Filsafat Barat", "Nigel Warburton", "Filsafat", "Nuansa Cendekia", 76000),
+    Buku("Homo Sacer", "Giorgio Agamben", "Filsafat", "Ircisod", 76000),
+    Buku("Who Rules The World?", "Noam Chomsky", "Filsafat", "Bentang Pustaka", 88000),
+    Buku("Family Constellation", "Meilinda Sutanto", "Keluarga", "Elex Media Komputindo", 108000),
+    Buku("Saku Keluarga Berkah", "K.H. Mahsun Muhammad M.A", "Keluarga", "Qaf", 58000),
+    Buku("Tur Karakter In Action", "Melly Kiong", "Keluarga", "Elex Media Komputindo", 88000),
+    Buku("From Singlelillah to Jannah", "Windya Novita", "Keluarga", "Genesis", 52000),
+    Buku("Semua Anak Bintang", "Munif Chatib", "Keluarga", "Kaifa Publishing", 80000),
+    Buku("Etika Dan Moral Penegak Hukum Di Indonesia", "A.Salman Maggalatung", "Hukum", "RajaGrafindo Persada", 71000),
+    Buku("CR: The Law Of Attraction", "N.M. Silber", "Hukum", "Elex Media Komputindo", 65000),
+    Buku("Hukum Progresif dan Postmodernisme", "Hyronimus Rhiti", "Hukum", "Genta Publishing", 124000),
+    Buku("Aspek Hukum Pasar Modal", "Suratman", "Hukum", "Setara Press", 92000),
+    Buku("Pengantar Hukum Kejahatan Bisnis", "Prof. Dr. Romli Atmasasmita, S.H., LL.M.", "Hukum", "Prenadamedia Group", 92000),
+    Buku("Luhut", "Noorca M. Massardi", "Ilmu Sosial", "Pbk", 139000),
+    Buku("Seri Tempo: Sjahrir", "Tempo", "Ilmu Sosial", "Kepustakaan Populer Gramedia", 60000),
+    Buku("Sejarah Peradaban dan Pemikiran Ekonomi Islam 1", "Rahmatina A. Kasri", "Ilmu Sosial", "Gramedia Widiasarana Indonesia", 145000),
+    Buku("Sapiens", "Yuval Noah Harari", "Ilmu Sosial", "Kepustakaan Populer Gramedia", 150000),
+    Buku("Belenggu Nalar", "Laksamana Sukardi", "Ilmu Sosial", "Penerbit Buku Kompas", 89000),
+    Buku("Dasar-Dasar Pendidikan", "Prof. Dr. Suyanto, M.Pd.", "Pendidikan", "Bumi Aksara", 89000),
+    Buku("Matematika untuk SMP Kelas 9", "Tim Gakko Tosho", "Pendidikan", "Pusat Perbukuan", 30000),
+    Buku("Smart Book: Pendidikan Pancasila 7 untuk SMP/MTs Kurikulum Merdeka", "Restu Sanubari, Amin Suprihatini", "Pendidikan", "Intan Pariwara Edukasi", 133000),
+    Buku("Ragam Aktivitas Positif Siswa Sekolah Dasar", "Ahmad Hidayat, S.Pd.", "Pendidikan", "Arruzz Media", 63000),
+    Buku("Membangun Generasi Aktif Literasi", "Malahayati Dan Peng Kheng Sun", "Pendidikan", "Penerbit Gava Media", 61000),
+    Buku("Tak Ada Asu di Antara Kita", "Joko Pinurbo", "Puisi", "Gramedia Pustaka Utama", 66000),
+    Buku("Tirani Demokrasi", "Sapardi Djoko Damono", "Puisi", "Gramedia Pustaka Utama", 74000),
+    Buku("Perihal Gendis", "Sapardi Djoko Damono", "Puisi", "Gramedia Pustaka Utama", 52000),
+    Buku("Bilang Begini, Maksudnya Begitu", "Sapardi Djoko Damono", "Puisi", "Gramedia Pustaka Utama", 44000),
+    Buku("Aku Ini Binatang Jalang", "Chairil Anwar", "Puisi", "Gramedia Pustaka Utama", 52000),
+    Buku("Atomic Habits", "James Clear", "Self-Improvment", "Gramedia Pustaka Utama", 96000),
+    Buku("Dao De Jing: The Wisdom of Lao Zi", "Andri Wang", "Self-Improvment", "Gramedia Pustaka Utama", 73000),
+    Buku("Tak Apa-Apa Tak Sempurna", "Brene Brown", "Self-Improvment", "Gramedia Pustaka Utama", 79000),
+    Buku("Success Habits", "Napoleon Hill", "Self-Improvment", "Gramedia Pustaka Utama", 66000),
+    Buku("Bittersweet", "Susan Cain", "Self-Improvment", "Gramedia Pustaka Utama", 111000)
+};
+//inisialisasi vektor data kategori
+vector<Tema> kategoriBuku = {
+    Tema("Fiksi"),
+    Tema("Filsafat"),
+    Tema("Keluarga"), 
+    Tema("Hukum"),
+    Tema("Ilmu Sosial"),
+    Tema("Pendidikan"),
+    Tema("Puisi"),
+    Tema("Self-Improvment")
+};
+
+//kembali ke menu utama
+int main() {
+    Menu();
+    return 0;
+}
+
+//tampilan menu utama
+void Menu() {
+    int pilihan;
+    do {
+        clearScreen();
+        cout << "========================================" << endl;
+        cout << "      Selamat Datang Di Toko Buku       " << endl;
+        cout << "========================================" << endl;
+        cout << "Menu:" << endl;
+        cout << "1. Daftar Buku" << endl;
+        cout << "2. Kategori Buku" << endl;
+        cout << "3. Cari Buku" << endl;
+        cout << "4. Keluar" << endl;
+        cout << "========================================" << endl;
+        cout << "Pilih menu: ";
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                DaftarBuku(daftarBuku);
+                break;
+            case 2:
+                pengkategorian(kategoriBuku);
+                break;
+            case 3:
+                searchBuku(daftarBuku);
+                break;
+            case 4:
+                cout << "Terima kasih telah berkunjung!" << endl;
+                break;
+            default:
+                cout << "Pilihan tidak valid, coba lagi." << endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+                cin.get(); 
+        }
+    } while (pilihan != 4);
+}
+
+//pencarian buku berdasarkan judul
+void searchBuku(const vector<Buku>& daftarBuku) {
+    clearScreen();
+    string search;
+    cout << "========================================" << endl;
+    cout << "               Cari Buku                " << endl;
+    cout << "========================================" << endl;
+    cout << "Masukkan judul buku: ";
+    cin.ignore(); 
+    getline(cin, search);
+
+    transform(search.begin(), search.end(), search.begin(), ::tolower);
+
+    vector<Buku> hasilPencarian;
+    for (const auto& buku : daftarBuku) {
+        string judulLower = buku.judul;
+        transform(judulLower.begin(), judulLower.end(), judulLower.begin(), ::tolower);
+        if (judulLower.find(search) != string::npos) {
+            hasilPencarian.push_back(buku);
+        }
+    }
+    if (hasilPencarian.empty()) {
+        cout << "Buku tidak ditemukan." << endl;
+    } else {
+        cout << "Hasil Pencarian:" << endl;
+        for (size_t i = 0; i < hasilPencarian.size(); ++i) {
+            cout << (i + 1) << ". " << hasilPencarian[i].judul << " - " << hasilPencarian[i].penulis << endl;
+        }
+        cout << "========================================" << endl;
+        cout << "Pilih buku untuk membeli (0 untuk kembali): ";
+        int pilihan;
+        cin >> pilihan;
+        if (pilihan > 0 && pilihan <= hasilPencarian.size()) {
+            int indexBuku = pilihan - 1;
+            beliBuku(hasilPencarian, indexBuku);
+        } else if (pilihan == 0) {
+            return;
+        } else {
+            cout << "Pilihan tidak valid." << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            cin.get(); 
+        }
+    }
+    cout << "Tekan Enter untuk kembali ke menu...";
+    cin.get();
+}
+
+//menampilkan semua daftar buku yang tersedia
+void DaftarBuku(vector<Buku> &daftarBuku) {
+    clearScreen();
+    cout << "========================================" << endl;
+    cout << "            Daftar Buku Tersedia        " << endl;
+    cout << "========================================" << endl;
+    for (size_t i = 0; i < daftarBuku.size(); ++i) {
+        cout << (i + 1) << ". " << daftarBuku[i].judul << endl;
+    }
+    cout << "0. Kembali" << endl;
+    cout << "========================================" << endl;
+    cout << "Pilih buku: ";
+    int pilihan;
+    cin >> pilihan;
+
+    if (pilihan > 0 && pilihan <= daftarBuku.size()) {
+        beliBuku(daftarBuku, pilihan - 1);
+    } else if (pilihan == 0) {
+        return;
+    } else {
+        cout << "Pilihan tidak valid, coba lagi." << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+        cin.get(); 
+        DaftarBuku(daftarBuku);
+    }
+}
+
+//menampilkan kategori yang tersedia
+void pengkategorian(const vector<Tema> &kategoriBuku) {
+    clearScreen();
+    cout << "========================================" << endl;
+    cout << "             Kategori Buku              " << endl;
+    cout << "========================================" << endl;
+    for (size_t i = 0; i < kategoriBuku.size(); ++i) {
+        cout << i + 1 << ". " << kategoriBuku[i].kategori << endl;
+    }
+    cout << "========================================" << endl;
+
+    int index;
+    cout << "Pilih kategori untuk melihat daftar buku (0 untuk kembali): ";
+    cin >> index;
+
+    if (index > 0 && index <= kategoriBuku.size()) {
+        clearScreen();
+        string kategoriDipilih = kategoriBuku[index - 1].kategori;
+        cout << "========================================" << endl;
+        cout << "     Daftar Buku Kategori " << kategoriDipilih << "     " << endl;
+        cout << "========================================" << endl;
+        vector<int> bukuIndeks;
+        for (size_t i = 0; i < daftarBuku.size(); ++i) {
+            if (daftarBuku[i].tema == kategoriDipilih) {
+                cout << bukuIndeks.size() + 1 << ". " << daftarBuku[i].judul << " - " << daftarBuku[i].penulis << endl;
+                bukuIndeks.push_back(i);
+            }
+        }
+        cout << "========================================" << endl;
+        cout << "Masukkan nomor buku untuk melihat informasi (0 untuk kembali): ";
+        int pilihanBuku;
+        cin >> pilihanBuku;
+        if (pilihanBuku > 0 && pilihanBuku <= bukuIndeks.size()) {
+            int indexBuku = bukuIndeks[pilihanBuku - 1];
+            clearScreen();
+            beliBuku(daftarBuku, indexBuku);
+        } else if (pilihanBuku == 0) {
+            return;
+        } else {
+            cout << "Pilihan tidak valid." << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            cin.get(); 
+        }
+    }
+}
+
+//method beli buku
+void beliBuku(vector<Buku>& daftarBuku, int index) {
+    char pilihan;
+    clearScreen();
+    daftarBuku[index].tampilkanInformasi();
+    cout << "Ingin membeli (Y/N)? ";
+    cin >> pilihan;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    if (pilihan == 'Y' || pilihan == 'y') {
+        tampilkanNotaPembayaran(daftarBuku[index]);
+    } else if (pilihan == 'N' || pilihan == 'n') {
+        cout << "Kembali ke menu." << endl;
+    } else {
+        cout << "Pilihan tidak valid. Kembali ke menu." << endl;
+    }
+    cin.get();
+}
+
+//nota pembayaran
+void tampilkanNotaPembayaran(const Buku &buku) {
+    clearScreen();
+    cout << "========================================" << endl;
+    cout << "            Nota Pembayaran             " << endl;
+    cout << "========================================" << endl;
+    cout << "Judul: " << buku.judul << endl;
+    cout << "Harga: " << buku.harga << endl;
+    cout << "========================================" << endl;
+    cout << "Terima kasih telah membeli buku ini!" << endl;
+    cout << "Tekan Enter untuk kembali ke menu...";
+    cin.get();
+}
